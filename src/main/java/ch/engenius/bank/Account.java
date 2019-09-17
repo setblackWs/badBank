@@ -14,6 +14,9 @@ public class Account {
     }
 
     public void deposit(double amount) {
+        if(amount < 0) {
+            throw new IllegalArgumentException("negative amounts cannot be deposited");
+        }
         setMoney(money + amount);
     }
 

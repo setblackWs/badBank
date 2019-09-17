@@ -5,7 +5,7 @@ import java.util.HashMap;
 public class Bank {
     private HashMap<Integer, Account> accounts = new HashMap<>();
 
-    public Account registerAccount(int accountNumber, int amount) {
+    public Account registerAccount(int accountNumber, double amount) {
         Account account = new Account();
         account.setMoney(amount);
         accounts.put(accountNumber, account);

@@ -6,7 +6,7 @@ public class Account {
     private double money;
 
     public void withdraw(double amount) {
-        if ((money - amount) < 0) {
+        if (money - amount < 0) {
             throw new IllegalStateException("not enough credits on account");
         }
         setMoney(money - amount);

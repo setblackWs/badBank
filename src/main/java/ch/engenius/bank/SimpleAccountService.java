@@ -2,6 +2,7 @@ package ch.engenius.bank;
 
 import ch.engenius.bank.api.AccountService;
 import ch.engenius.bank.api.Store;
+import ch.engenius.bank.api.TransactionException;
 import ch.engenius.bank.model.Account;
 
 public class SimpleAccountService implements AccountService {
@@ -13,34 +14,38 @@ public class SimpleAccountService implements AccountService {
     }
 
     @Override
-    public void withdraw(int number, double amount) {
+    public void withdraw(int number, double amount) throws TransactionException {
         Account account = accounts.get(number);
 
         if(account == null) {
-            throw new IllegalArgumentException("No account found");
+            throw new TransactionException("No account found");
         }
 
         if (account.getMoney() - amount < 0) {
-            throw new IllegalStateException("not enough credits on account");
+            throw new TransactionException("not enough credits on account");
         }
 
-        account.setMoney(account.getMoney() - amount);
+        synchronized (account) {
+            account.setMoney(account.getMoney() - amount);
+        }
 
     }
 
     @Override
-    public void deposit(int number, double amount) {
+    public void deposit(int number, double amount) throws TransactionException {
         if(amount < 0) {
-            throw new IllegalArgumentException("negative amounts cannot be deposited");
+            throw new TransactionException("negative amounts cannot be deposited");
         }
 
         Account account = accounts.get(number);
 
         if(account == null) {
-            throw new IllegalArgumentException("No account found");
+            throw new TransactionException("No account found");
         }
 
-        account.setMoney(account.getMoney() + amount);
+        synchronized (account) {
+            account.setMoney(account.getMoney() + amount);
+        }
     }
 
 }

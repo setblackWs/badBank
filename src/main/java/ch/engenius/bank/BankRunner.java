@@ -2,6 +2,7 @@ package ch.engenius.bank;
 
 import ch.engenius.bank.api.AccountService;
 import ch.engenius.bank.api.Store;
+import ch.engenius.bank.api.TransactionException;
 import ch.engenius.bank.model.Account;
 
 import java.math.BigDecimal;
@@ -54,8 +55,23 @@ public class BankRunner {
         double transfer = random.nextDouble() * 100.0;
         int accountInNumber = random.nextInt(maxAccount);
         int accountOutNumber = random.nextInt(maxAccount);
-        accountService.deposit(accountInNumber, transfer);
-        accountService.withdraw(accountOutNumber, transfer);
+
+        try {
+            accountService.withdraw(accountOutNumber, transfer);
+        } catch (TransactionException e) {
+            // we cannot complete the transaction
+            return;
+        }
+        try {
+            accountService.deposit(accountInNumber, transfer);
+        } catch (TransactionException e) {
+            // rollback
+            try {
+                accountService.deposit(accountOutNumber, transfer);
+            } catch (TransactionException e1) {
+                System.out.println("rollback failed, there is no specified behavior for this scenario");
+            }
+        }
     }
 
     private void registerAccounts(int number, int defaultMoney) {

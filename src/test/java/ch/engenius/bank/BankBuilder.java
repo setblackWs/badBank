@@ -13,7 +13,7 @@ public class BankBuilder {
 
     public BankBuilder() {
         InMemoryStore<Integer, Account> accountStore = new InMemoryStore<>();
-        this.bank = new Bank(accountStore);
+        this.bank = new Bank(accountStore, new SimpleAccountService(accountStore));
         this.accounts = new ArrayList<>();
     }
 

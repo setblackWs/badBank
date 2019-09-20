@@ -2,8 +2,8 @@ package ch.engenius.bank;
 
 import ch.engenius.bank.api.AccountService;
 import ch.engenius.bank.api.Store;
+import ch.engenius.bank.api.TransactionException;
 import ch.engenius.bank.model.Account;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -22,7 +22,7 @@ public class SimpleAccountServiceTest {
         assertEquals(expected, actual, 0f);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = TransactionException.class)
     public void withdraw_NotEnoughMoney_throwsIllegalStateException() throws Exception {
         AccountService testObj = new SimpleAccountService(new AccountStoreBuilder().withAccount(0, anAccount(90d)).build());
 
@@ -41,7 +41,7 @@ public class SimpleAccountServiceTest {
         assertEquals(expected, actual, 0f);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = TransactionException.class)
     public void deposit_NegativeAmount_throwsIllegalArgumentException() throws Exception {
         AccountService testObj = new SimpleAccountService(new AccountStoreBuilder().withAccount(0, anAccount(90d)).build());
 

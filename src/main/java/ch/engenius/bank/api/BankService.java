@@ -7,4 +7,6 @@ public interface BankService {
     Account registerAccount(int accountNumber, double amount);
 
     Account getAccount(int number);
+
+    void doTransaction(int inAccount, int outAccount, double amount);
 }

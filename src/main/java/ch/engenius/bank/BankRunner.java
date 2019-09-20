@@ -23,7 +23,7 @@ public class BankRunner {
     public BankRunner() {
         Store<Integer, Account> store = new InMemoryStore<>();
         this.accountService = new SimpleAccountService(store);
-        this.bank = new Bank(store);
+        this.bank = new Bank(store, this.accountService);
     }
 
 
@@ -56,22 +56,7 @@ public class BankRunner {
         int accountInNumber = random.nextInt(maxAccount);
         int accountOutNumber = random.nextInt(maxAccount);
 
-        try {
-            accountService.withdraw(accountOutNumber, transfer);
-        } catch (TransactionException e) {
-            // we cannot complete the transaction
-            return;
-        }
-        try {
-            accountService.deposit(accountInNumber, transfer);
-        } catch (TransactionException e) {
-            // rollback
-            try {
-                accountService.deposit(accountOutNumber, transfer);
-            } catch (TransactionException e1) {
-                System.out.println("rollback failed, there is no specified behavior for this scenario");
-            }
-        }
+        bank.doTransaction(accountInNumber, accountOutNumber, transfer);
     }
 
     private void registerAccounts(int number, int defaultMoney) {

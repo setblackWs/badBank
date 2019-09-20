@@ -1,5 +1,9 @@
 package ch.engenius.bank;
 
+import ch.engenius.bank.api.AccountService;
+import ch.engenius.bank.api.Store;
+import ch.engenius.bank.model.Account;
+
 import java.math.BigDecimal;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -12,7 +16,14 @@ public class BankRunner {
     private static final ExecutorService executor = Executors.newFixedThreadPool(8);
 
     private final Random random = new Random(43);
-    private final Bank bank = new Bank();
+    private final Bank bank;
+    private final AccountService accountService;
+
+    public BankRunner() {
+        Store<Integer, Account> store = new InMemoryStore<>();
+        this.accountService = new SimpleAccountService(store);
+        this.bank = new Bank(store);
+    }
 
 
     public static void main(String[] args) {
@@ -43,10 +54,8 @@ public class BankRunner {
         double transfer = random.nextDouble() * 100.0;
         int accountInNumber = random.nextInt(maxAccount);
         int accountOutNumber = random.nextInt(maxAccount);
-        Account accIn = bank.getAccount(accountInNumber);
-        Account accOut = bank.getAccount(accountOutNumber);
-        accIn.deposit(transfer);
-        accOut.withdraw(transfer);
+        accountService.deposit(accountInNumber, transfer);
+        accountService.withdraw(accountOutNumber, transfer);
     }
 
     private void registerAccounts(int number, int defaultMoney) {

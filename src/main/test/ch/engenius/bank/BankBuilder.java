@@ -1,5 +1,7 @@
 package ch.engenius.bank;
 
+import ch.engenius.bank.model.Account;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -10,7 +12,8 @@ public class BankBuilder {
     private List<Account> accounts;
 
     public BankBuilder() {
-        this.bank = new Bank();
+        InMemoryStore<Integer, Account> accountStore = new InMemoryStore<>();
+        this.bank = new Bank(accountStore);
         this.accounts = new ArrayList<>();
     }
 

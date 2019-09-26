@@ -2,6 +2,8 @@ package ch.engenius.bank;
 
 import org.junit.Test;
 
+import java.math.BigDecimal;
+
 import static org.junit.Assert.*;
 
 public class BankTest {
@@ -10,7 +12,7 @@ public class BankTest {
     public void registerAccount_validNumberAndAmount_newAccountCreated() throws Exception {
         Bank testObj = new BankBuilder().build();
 
-        testObj.registerAccount(0, 100);
+        testObj.registerAccount(0, BigDecimal.TEN);
 
         assertNotNull(testObj.getAccount(0));
     }
@@ -19,42 +21,42 @@ public class BankTest {
     public void registerAccount_validNumberAndAmount_newAccountHasCorrectAmount() throws Exception {
         Bank testObj = new BankBuilder().withAccount(0, 100).build();
 
-        double expected = 100;
-        double actual = testObj.getAccount(0).getMoney();
+        BigDecimal expected = BigDecimal.valueOf(100.0);
+        BigDecimal actual = testObj.getAccount(0).getMoney();
 
-        assertEquals(expected, actual, 0f);
+        assertEquals(expected, actual);
     }
 
     @Test
     public void doTransaction_validAccountsAndAmount_OK() throws Exception {
         Bank testObj = new BankBuilder().withAccount(0, 100).withAccount(1, 100).build();
 
-        double expectedIn = 110;
-        double expectedOut = 90;
+        BigDecimal expectedIn = BigDecimal.valueOf(110.0);
+        BigDecimal expectedOut = BigDecimal.valueOf(90.0);
 
-        testObj.doTransaction(0, 1, 10);
+        testObj.doTransaction(0, 1, BigDecimal.valueOf(10));
 
-        double actualIn = testObj.getAccount(0).getMoney();
-        double actualOut = testObj.getAccount(1).getMoney();
+        BigDecimal actualIn = testObj.getAccount(0).getMoney();
+        BigDecimal actualOut = testObj.getAccount(1).getMoney();
 
-        assertEquals(expectedIn, actualIn, 0f);
-        assertEquals(expectedOut, actualOut, 0f);
+        assertEquals(expectedIn, actualIn);
+        assertEquals(expectedOut, actualOut);
     }
 
     @Test
-    public void doTransaction_transactionFails_rollbackPerformed() throws Exception {
+    public void doTransaction_transactionFailsDueToNegativeAmount_rollbackPerformed() throws Exception {
         Bank testObj = new BankBuilder().withAccount(0, 100).withAccount(1, 100).build();
 
-        double expectedIn = 100;
-        double expectedOut = 100;
+        BigDecimal expectedIn = BigDecimal.valueOf(100.0);
+        BigDecimal expectedOut = BigDecimal.valueOf(100.0);
 
-        testObj.doTransaction(0, 2, 10);
+        testObj.doTransaction(0, 1, BigDecimal.valueOf(-10));
 
-        double actualIn = testObj.getAccount(0).getMoney();
-        double actualOut = testObj.getAccount(1).getMoney();
+        BigDecimal actualIn = testObj.getAccount(0).getMoney();
+        BigDecimal actualOut = testObj.getAccount(1).getMoney();
 
-        assertEquals(expectedIn, actualIn, 0f);
-        assertEquals(expectedOut, actualOut, 0f);
+        assertEquals(expectedIn, actualIn);
+        assertEquals(expectedOut, actualOut);
     }
 
 }

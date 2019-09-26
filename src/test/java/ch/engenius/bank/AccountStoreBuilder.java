@@ -1,7 +1,5 @@
 package ch.engenius.bank;
 
-import ch.engenius.bank.model.Account;
-
 public class AccountStoreBuilder {
 
     private InMemoryStore<Integer, Account> store;

@@ -1,9 +1,9 @@
 package ch.engenius.bank;
 
-import ch.engenius.bank.api.AccountService;
+import ch.engenius.bank.api.AccountException;
+import ch.engenius.bank.api.RetryTransactionException;
 import ch.engenius.bank.api.Store;
-import ch.engenius.bank.api.TransactionException;
-import ch.engenius.bank.model.Account;
+import ch.engenius.bank.api.TransactionFailedException;
 
 import java.math.BigDecimal;
 import java.util.Random;
@@ -18,12 +18,10 @@ public class BankRunner {
 
     private final Random random = new Random(43);
     private final Bank bank;
-    private final AccountService accountService;
 
     public BankRunner() {
         Store<Integer, Account> store = new InMemoryStore<>();
-        this.accountService = new SimpleAccountService(store);
-        this.bank = new Bank(store, this.accountService);
+        this.bank = new Bank(store);
     }
 
 
@@ -55,20 +53,34 @@ public class BankRunner {
         double transfer = random.nextDouble() * 100.0;
         int accountInNumber = random.nextInt(maxAccount);
         int accountOutNumber = random.nextInt(maxAccount);
-
-        bank.doTransaction(accountInNumber, accountOutNumber, transfer);
+        try {
+            bank.doTransaction(accountInNumber, accountOutNumber, BigDecimal.valueOf(transfer));
+        } catch (RetryTransactionException e) {
+            // If we land here we can safely rerun the transaction. I would suggest to spawn a new thread
+            // and run the same transaction again but since we're dealing with randomness here i'm not going
+            // to refactor that.
+            e.printStackTrace();
+        } catch (TransactionFailedException e) {
+            // If we land here, this means something with the transaction went wrong and it is possible
+            // that we have corrupted our data (meaning we inflated or deflated our overall money in the bank)
+            // So we should trigger some process to check what went wrong and correct the mistake.
+            e.printStackTrace();
+        } catch (Exception e) {
+            // this means that the transaction did not take place and we can't recover from the error
+            e.printStackTrace();
+        }
     }
 
     private void registerAccounts(int number, int defaultMoney) {
         for (int i = 0; i < number; i++) {
-            bank.registerAccount(i, defaultMoney);
+            bank.registerAccount(i, BigDecimal.valueOf(defaultMoney));
         }
     }
 
     private void sanityCheck(int accountMaxNumber, int totalExpectedMoney) {
         BigDecimal sum = IntStream.range(0, accountMaxNumber)
                 .mapToObj(bank::getAccount)
-                .map(Account::getMoneyAsBigDecimal)
+                .map(Account::getMoney)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         if (sum.intValue() != totalExpectedMoney) {

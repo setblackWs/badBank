@@ -3,7 +3,7 @@ package ch.engenius.bank;
 import ch.engenius.bank.api.*;
 
 import java.math.BigDecimal;
-import java.util.Objects;
+import java.util.Optional;
 
 public class Bank implements BankService {
     private Store<Integer, Account> accounts;
@@ -19,12 +19,13 @@ public class Bank implements BankService {
             throw new AccountException("Cannot create account with number null");
         }
 
-        if(accounts.get(accountNumber) != null) {
+        // Here I assume that the Store implementation is thread safe
+        if (accounts.get(accountNumber) != null) {
             throw new AccountException(String.format("Account %d already exists", accountNumber));
         }
 
-        Account account = new Account();
-        account.setMoney(amount);
+        // I think we can safely assume that the initial balance is zero of amount is null
+        Account account = new Account(Optional.ofNullable(amount).orElse(BigDecimal.ZERO));
         accounts.create(accountNumber, account);
         return account;
     }
@@ -39,56 +40,59 @@ public class Bank implements BankService {
     }
 
     @Override
-    public void doTransaction(Integer inAccount, Integer outAccount, BigDecimal amount) throws AccountException, TransactionFailedException, RetryTransactionException {
-        Objects.requireNonNull(inAccount, "inAccount must not be null");
-        Objects.requireNonNull(outAccount, "outAccount must not be null");
-        Objects.requireNonNull(amount, "inAccount must not be null");
+    public synchronized void doTransaction(Integer srcKey, Integer dstKey, BigDecimal amount) throws AccountException, TransactionFailedException, RetryTransactionException {
+        // We could use Objects.requireNonNull() here but because of the semantics of the
+        // transaction I chose to throw an AccountException instead of a NullpointerException.
+        //
+        if (srcKey == null) throw new AccountException("srcKey must not be null");
+        if (dstKey == null) throw new AccountException("dstKey must not be null");
+        // I throw AccountException here because it's a semantic problem and thus the transaction should not be retried
+        if (amount == null) throw new AccountException("amount must not be null");
 
-        Account src = getAccount(outAccount);
+        Account src = getAccount(srcKey);
         if (src == null) {
-            throw new AccountException(String.format("Account not found: %d", outAccount));
+            throw new AccountException(String.format("Account not found: %d", srcKey));
         }
 
-        Account dst = getAccount(inAccount);
+        Account dst = getAccount(dstKey);
         if (dst == null) {
-            throw new AccountException(String.format("Account not found: %d", inAccount));
+            throw new AccountException(String.format("Account not found: %d", dstKey));
         }
 
-        Object key = new Object();
+        Object txKey = new Object();
 
         try {
 
-            src.join(key);
-            dst.join(key);
+            src.join(txKey);
+            dst.join(txKey);
 
-            src.withdraw(key, amount);
-            dst.deposit(key, amount);
+            src.withdraw(txKey, amount);
+            dst.deposit(txKey, amount);
 
-            if (src.canCommit(key) && dst.canCommit(key)) {
+            if (src.canCommit(txKey) && dst.canCommit(txKey)) {
                 try {
-                    src.commit(key);
-                    dst.commit(key);
+                    src.commit(txKey);
+                    dst.commit(txKey);
                 } catch (TransactionException e) {
-                    rollback(key, src, dst);
-                    throw new TransactionFailedException(outAccount, inAccount, amount);
+                    rollback(txKey, src, dst);
+                    throw new TransactionFailedException(srcKey, dstKey, amount);
                 }
             } else {
-                rollback(key, src, dst);
+                rollback(txKey, src, dst);
                 // try again later is ok
-                throw new RetryTransactionException(outAccount, inAccount, amount);
+                throw new RetryTransactionException(srcKey, dstKey, amount);
             }
-            System.out.println(String.format("transaction completed: src=%f, dst=%f", src.getMoney(), dst.getMoney()));
 
 
         } catch (AccountException e) {
             // this means a semantic error and we cannot try again because we have either not enough money or deposited
             // an invalid amount of money. either way, a rollback is needed
-            rollback(key, src, dst);
+            rollback(txKey, src, dst);
             throw e;
         } catch (TransactionException e) {
-            rollback(key, src, dst);
+            rollback(txKey, src, dst);
             // already busy; we can try again later
-            throw new RetryTransactionException(outAccount, inAccount, amount);
+            throw new RetryTransactionException(srcKey, dstKey, amount);
         }
     }
 

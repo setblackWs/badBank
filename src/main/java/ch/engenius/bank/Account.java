@@ -11,11 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Standard implementation of a transactor using a pessimistic locking strategy.
  * For simplicity, I used the ReentrantLock for locking. However, this can and will
- * lead to deadlocks. So we would need to implement our own lock to prevent this and handle
- * this scenario, which needs to be specified by the business. One way could be to implement
- * a TimeoutLock, so the lock can be released after some time and the transaction can be rolled back and
- * be put in a list of transactions to retry or notify the "owner" of the transaction
- * that it failed.
+ * lead to deadlocks if we transfer money from one account to another and they are not executed synchronously.
  */
 public class Account implements AccountTransactor {
     private BigDecimal money = BigDecimal.ZERO;
@@ -27,12 +23,11 @@ public class Account implements AccountTransactor {
     private Object currentTransactionKey = null;
     private Lock lock = new ReentrantLock();
 
-    /**
-     * THIS METHOD IS FOR CONVENIENCE ONLY TO CREATE ACCOUNTS EN MASSE FOR TESTING.
-     *
-     * @param money
-     */
-    public synchronized void setMoney(BigDecimal money) {
+    public Account(double money) {
+        this(BigDecimal.valueOf(money));
+    }
+
+    public Account(BigDecimal money) {
         this.money = money;
     }
 
@@ -51,7 +46,7 @@ public class Account implements AccountTransactor {
         }
 
         if (amount == null) {
-            throw new TransactionException("Cannot deposit null");
+            throw new AccountException("Cannot deposit null");
         }
 
         synchronized (this) {
@@ -75,7 +70,7 @@ public class Account implements AccountTransactor {
         }
 
         if (amount == null) {
-            throw new TransactionException("Cannot withdraw null");
+            throw new AccountException("Cannot withdraw null");
         }
 
         synchronized (this) {

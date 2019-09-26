@@ -10,5 +10,5 @@ public interface BankService {
 
     Account getAccount(Integer number);
 
-    void doTransaction(Integer inAccount, Integer outAccount, BigDecimal amount) throws AccountException, TransactionFailedException, RetryTransactionException;
+    void doTransaction(Integer srcKey, Integer dstKey, BigDecimal amount) throws AccountException, TransactionFailedException, RetryTransactionException;
 }

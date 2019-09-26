@@ -6,9 +6,9 @@ import java.math.BigDecimal;
 
 public interface BankService {
 
-    Account registerAccount(int accountNumber, BigDecimal amount);
+    Account registerAccount(Integer accountNumber, BigDecimal amount) throws AccountException;
 
-    Account getAccount(int number);
+    Account getAccount(Integer number);
 
-    void doTransaction(int inAccount, int outAccount, BigDecimal amount) throws AccountException, TransactionFailedException, RetryTransactionException;
+    void doTransaction(Integer inAccount, Integer outAccount, BigDecimal amount) throws AccountException, TransactionFailedException, RetryTransactionException;
 }

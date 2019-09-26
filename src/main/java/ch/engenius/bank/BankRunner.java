@@ -27,7 +27,7 @@ public class BankRunner {
 
     public static void main(String[] args) {
         BankRunner runner = new BankRunner();
-        int accounts = 100;
+        int accounts = 2;
         int defaultDeposit = 1000;
         int iterations = 10000;
         runner.registerAccounts(accounts, defaultDeposit);
@@ -63,17 +63,23 @@ public class BankRunner {
         } catch (TransactionFailedException e) {
             // If we land here, this means something with the transaction went wrong and it is possible
             // that we have corrupted our data (meaning we inflated or deflated our overall money in the bank)
-            // So we should trigger some process to check what went wrong and correct the mistake.
+            // So we should trigger some process to check what went wrong and correct the mistake, but that's
+            // to be specified by the business.
             e.printStackTrace();
         } catch (Exception e) {
-            // this means that the transaction did not take place and we can't recover from the error
+            // this means that the transaction did not take place and we can't recover from the error.
+            // Again, how we handle that depends on how the business specifies it.
             e.printStackTrace();
         }
     }
 
     private void registerAccounts(int number, int defaultMoney) {
         for (int i = 0; i < number; i++) {
-            bank.registerAccount(i, BigDecimal.valueOf(defaultMoney));
+            try {
+                bank.registerAccount(i, BigDecimal.valueOf(defaultMoney));
+            } catch (AccountException e) {
+                e.printStackTrace();
+            }
         }
     }
 

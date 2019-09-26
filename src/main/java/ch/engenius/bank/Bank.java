@@ -3,6 +3,7 @@ package ch.engenius.bank;
 import ch.engenius.bank.api.*;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class Bank implements BankService {
     private Store<Integer, Account> accounts;
@@ -13,7 +14,15 @@ public class Bank implements BankService {
     }
 
     @Override
-    public Account registerAccount(int accountNumber, BigDecimal amount) {
+    public Account registerAccount(Integer accountNumber, BigDecimal amount) throws AccountException {
+        if (accountNumber == null) {
+            throw new AccountException("Cannot create account with number null");
+        }
+
+        if(accounts.get(accountNumber) != null) {
+            throw new AccountException(String.format("Account %d already exists", accountNumber));
+        }
+
         Account account = new Account();
         account.setMoney(amount);
         accounts.create(accountNumber, account);
@@ -21,15 +30,19 @@ public class Bank implements BankService {
     }
 
     @Override
-    public Account getAccount(int number) {
+    public Account getAccount(Integer number) {
+        if (number == null) {
+            return null;
+        }
+
         return accounts.get(number);
     }
 
     @Override
-    public void doTransaction(int inAccount, int outAccount, BigDecimal amount) throws AccountException, TransactionFailedException, RetryTransactionException {
-        if (amount == null) {
-            throw new IllegalArgumentException("amount cannot be null");
-        }
+    public void doTransaction(Integer inAccount, Integer outAccount, BigDecimal amount) throws AccountException, TransactionFailedException, RetryTransactionException {
+        Objects.requireNonNull(inAccount, "inAccount must not be null");
+        Objects.requireNonNull(outAccount, "outAccount must not be null");
+        Objects.requireNonNull(amount, "inAccount must not be null");
 
         Account src = getAccount(outAccount);
         if (src == null) {
@@ -44,6 +57,7 @@ public class Bank implements BankService {
         Object key = new Object();
 
         try {
+
             src.join(key);
             dst.join(key);
 

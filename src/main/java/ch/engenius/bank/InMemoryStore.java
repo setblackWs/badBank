@@ -22,4 +22,5 @@ public class InMemoryStore<K, V> implements Store<K, V> {
     public V get(K id) {
         return this.accounts.get(id);
     }
+
 }

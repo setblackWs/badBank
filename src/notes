@@ -1,0 +1,35 @@
+All changes and bugs are described here.
+
+Account:
+- refactored all to BigDecimal, because floating point primitives are not exactly precise, in banking systems
+    this can cause big problems
+- added helper method for checking possibility to withdraw money
+- added constructor with BigDecimal parameter, removed setter, in order to limit possibility of manipulation regarding
+    money amount
+- passing clone of money for getter, because of need to prevent changing anything by reference from outside
+
+Bank:
+- it is always better to set interface as type of attribute because of code flexibility, so then HashMap is replaced
+    with Map as type of accounts
+- adapted to work with BigDecimals
+- removed returning type from registering Account method, since it can be considered as some type of setter
+- calling Account constructor with parameter instead of removed setter (in Account class)
+- wrapped getting account method with check for null, throwing NoSuchElementException if not found account with given
+    key
+
+BankRunner:
+- there are couple of bugs:
+    method runRandomOperation(int maxAccount):
+    - BUG 1: first it was doing deposit, and then withdrawing, in that case money can be paid in, but then if
+        amount to reduce is bigger than there are money on account, it will break flow - making bank state inconsistent
+    - BUG 2: method should be synchronized because multiple threads can execute this method in state of manipulating
+        the same account, and by that we have concurrency and some dirty read/writes. By setting this method as
+        synchronized we claiming the highest level of isolation - SERIALIZE (if we make parallel with database
+        transaction)
+- calling getter directly for getting amount of money from accounts
+
+Overall:
+- String.format() is always nicer that string concatenation
+- at classes Bank and Account left double as parameters type because I wanted to change as less as possible BankRunner
+    class
+- added some test cases, just to verify methods after completion of task

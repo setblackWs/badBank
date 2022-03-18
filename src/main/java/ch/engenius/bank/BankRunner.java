@@ -6,9 +6,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.stream.IntStream;
 
 public class BankRunner {
@@ -35,13 +33,10 @@ public class BankRunner {
     }
 
     private void runBank(int iterations, int maxAccount) {
-        List<Callable<String>> callableTasks = new ArrayList<>();
+        List<Callable<Void>> callableTasks = new ArrayList<>();
 
         for (int i = 0; i < iterations; i++) {
-            Callable<String> callableTask = () -> {
-                runRandomOperation(maxAccount);
-                return "";
-            };
+            Callable<Void> callableTask = () -> runRandomOperation(maxAccount);
             callableTasks.add(callableTask);
         }
 
@@ -53,11 +48,12 @@ public class BankRunner {
         executor.shutdown();
     }
 
-    private void runRandomOperation(int maxAccount) {
+    private Void runRandomOperation(int maxAccount) {
         BigDecimal transfer = BigDecimal.valueOf(random.nextDouble() * 100.0);
         int accountInNumber = random.nextInt(maxAccount);
         int accountOutNumber = random.nextInt(maxAccount);
         bankService.transferMoney(transfer, accountInNumber, accountOutNumber);
+        return null;
     }
 
     private void  registerAccounts(int number, BigDecimal defaultMoney) {

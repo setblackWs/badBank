@@ -55,9 +55,9 @@ public class BankUnitTest {
     @Test
     public void givenValidAccountNumberThenGetAccountWillReturnAccount() throws AccountNotFoundException {
         Account account = new Account(BigDecimal.valueOf(100));
-        given(bank.getAccount(TestData.EXISTING_ACCOUNT_NUMBER)).willReturn(account);
+        given(bank.getAccount(TestData.EXISTING_ACCOUNT_NUMBER_1)).willReturn(account);
 
-        Account result = bank.getAccount(TestData.EXISTING_ACCOUNT_NUMBER);
+        Account result = bank.getAccount(TestData.EXISTING_ACCOUNT_NUMBER_1);
 
         assertNotNull(account);
         assertEquals(result.getMoney(), account.getMoney());

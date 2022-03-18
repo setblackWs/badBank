@@ -3,7 +3,8 @@ package ch.engenius.bank.service.account;
 import ch.engenius.bank.context.DataContext;
 import ch.engenius.bank.exception.AccountNotFoundException;
 import ch.engenius.bank.model.Account;
-import ch.engenius.bank.repository.AccountRepository;
+import ch.engenius.bank.repository.account.AccountRepository;
+import ch.engenius.bank.repository.account.AccountRepositoryImpl;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -12,10 +13,10 @@ import java.util.concurrent.locks.ReentrantLock;
 public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
 
-    private ReentrantLock lock;
+    private final ReentrantLock lock;
 
     public AccountServiceImpl(DataContext dataContext) {
-        accountRepository = new AccountRepository(dataContext);
+        accountRepository = new AccountRepositoryImpl(dataContext);
         lock = new ReentrantLock();
     }
 
@@ -30,9 +31,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private void withdraw(int accountNumber, BigDecimal withdrawAmount) throws AccountNotFoundException {
-        Account account = getAccount(accountNumber);
         checkIfHasEnoughMoney(accountNumber, withdrawAmount);
-
+        Account account = getAccount(accountNumber);
         BigDecimal newAmount = account.getMoney().subtract(withdrawAmount);
         setMoney(accountNumber, newAmount);
     }
@@ -63,7 +63,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private void checkIfHasEnoughMoney(int accountNumber, BigDecimal withdrawAmount) throws AccountNotFoundException {
-        if (!hasEnoughMoney(accountNumber, withdrawAmount))
+        if (!hasEnoughMoney(accountNumber, withdrawAmount)) {
             throw new IllegalStateException("not enough credits on account");
+        }
     }
 }

@@ -55,9 +55,9 @@ public class DataContextUnitTest {
     @Test
     public void givenValidAccountNumberThenGetAccountWillReturnAccount() throws AccountNotFoundException {
         Account account = new Account(BigDecimal.valueOf(100));
-        given(dataContext.getAccount(TestData.EXISTING_ACCOUNT_NUMBER)).willReturn(account);
+        given(dataContext.getAccount(TestData.EXISTING_ACCOUNT_NUMBER_1)).willReturn(account);
 
-        Account result = dataContext.getAccount(TestData.EXISTING_ACCOUNT_NUMBER);
+        Account result = dataContext.getAccount(TestData.EXISTING_ACCOUNT_NUMBER_1);
 
         assertNotNull(account);
         assertEquals(result.getMoney(), account.getMoney());

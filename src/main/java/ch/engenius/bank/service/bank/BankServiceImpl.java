@@ -2,20 +2,17 @@ package ch.engenius.bank.service.bank;
 
 import ch.engenius.bank.context.DataContext;
 import ch.engenius.bank.model.Account;
-import ch.engenius.bank.repository.BankRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import ch.engenius.bank.repository.bank.BankRepository;
+import ch.engenius.bank.repository.bank.BankRepositoryImpl;
 
 import java.math.BigDecimal;
 
-@RequiredArgsConstructor
-@Component
 public class BankServiceImpl implements BankService {
     private final BankRepository bankRepository;
 
 
     public BankServiceImpl(DataContext dataContext) {
-        bankRepository = new BankRepository(dataContext);
+        bankRepository = new BankRepositoryImpl(dataContext);
     }
 
     public void registerAccounts(int number, BigDecimal defaultMoney) {

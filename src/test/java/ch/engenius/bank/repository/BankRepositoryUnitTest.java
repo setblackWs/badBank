@@ -1,8 +1,8 @@
 package ch.engenius.bank.repository;
 
 import ch.engenius.bank.TestData;
-import ch.engenius.bank.context.DataContextUnitTest;
 import ch.engenius.bank.model.Account;
+import ch.engenius.bank.repository.bank.BankRepositoryImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -14,8 +14,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 public class BankRepositoryUnitTest {
-    private BankRepository bankRepository =
-            Mockito.mock(BankRepository.class);
+    private BankRepositoryImpl bankRepository =
+            Mockito.mock(BankRepositoryImpl.class);
 
 
     @Test

@@ -25,16 +25,8 @@ public class BankRunnerTask implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
-        tryRunningRandomOperation(this.maxAccount);
+        runRandomOperation(this.maxAccount);
         return null;
-    }
-
-    private void tryRunningRandomOperation(int maxAccount) {
-        try {
-            runRandomOperation(maxAccount);
-        } catch (InterruptedException | AccountNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
     private void runRandomOperation(int maxAccount) throws InterruptedException, AccountNotFoundException {

@@ -1,17 +1,15 @@
-package ch.engenius.bank.repository;
+package ch.engenius.bank.repository.account;
 
 import ch.engenius.bank.context.DataContext;
 import ch.engenius.bank.exception.AccountNotFoundException;
 import ch.engenius.bank.model.Account;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 
-@Component
-public class AccountRepository {
+public class AccountRepositoryImpl implements AccountRepository {
     private DataContext dataContext;
 
-    public AccountRepository(DataContext dataContext) {
+    public AccountRepositoryImpl(DataContext dataContext) {
         this.dataContext = dataContext;
     }
 

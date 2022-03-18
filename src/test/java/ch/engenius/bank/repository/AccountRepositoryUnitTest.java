@@ -1,9 +1,9 @@
 package ch.engenius.bank.repository;
 
 import ch.engenius.bank.TestData;
-import ch.engenius.bank.context.DataContextUnitTest;
 import ch.engenius.bank.exception.AccountNotFoundException;
 import ch.engenius.bank.model.Account;
+import ch.engenius.bank.repository.account.AccountRepositoryImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -14,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 
 public class AccountRepositoryUnitTest {
-    private AccountRepository accountRepository =
-            Mockito.mock(AccountRepository.class);
+    private AccountRepositoryImpl accountRepository =
+            Mockito.mock(AccountRepositoryImpl.class);
 
     private HashMap<Integer, Account> getBankAccounts() {
         HashMap<Integer, Account> accounts = new HashMap<>();
@@ -35,9 +35,9 @@ public class AccountRepositoryUnitTest {
     @Test
     public void givenValidAccountNumberThenGetAccountWillReturnAccount() throws AccountNotFoundException {
         Account account = new Account(BigDecimal.valueOf(100));
-        given(accountRepository.getAccount(TestData.EXISTING_ACCOUNT_NUMBER)).willReturn(account);
+        given(accountRepository.getAccount(TestData.EXISTING_ACCOUNT_NUMBER_1)).willReturn(account);
 
-        Account result = accountRepository.getAccount(TestData.EXISTING_ACCOUNT_NUMBER);
+        Account result = accountRepository.getAccount(TestData.EXISTING_ACCOUNT_NUMBER_1);
 
         assertNotNull(account);
         assertEquals(result.getMoney(), account.getMoney());

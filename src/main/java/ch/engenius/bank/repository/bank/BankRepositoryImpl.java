@@ -1,12 +1,12 @@
-package ch.engenius.bank.repository;
+package ch.engenius.bank.repository.bank;
 
 import ch.engenius.bank.context.DataContext;
 import ch.engenius.bank.model.Account;
 
-public class BankRepository {
+public class BankRepositoryImpl implements BankRepository {
     private DataContext dataContext;
 
-    public BankRepository(DataContext dataContext) {
+    public BankRepositoryImpl(DataContext dataContext) {
         this.dataContext = dataContext;
     }
 

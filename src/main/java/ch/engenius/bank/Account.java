@@ -3,29 +3,45 @@ package ch.engenius.bank;
 import java.math.BigDecimal;
 
 public class Account {
-    private double money;
+    private BigDecimal money;
 
-    public void withdraw(double amount) {
-        if ((money - amount) < 0) {
-            throw new IllegalStateException("not enough credits on account");
-        }
-        setMoney(money - amount);
-
+    public Account() {
+        this(BigDecimal.ZERO);
     }
 
-    public void deposit(double amount) {
-        setMoney(money + amount);
-    }
-
-    public double getMoney() {
-        return money;
-    }
-
-    public void setMoney(double money) {
+    public Account(BigDecimal money) {
         this.money = money;
     }
 
-    public BigDecimal getMoneyAsBigDecimal() {
-        return BigDecimal.valueOf(money);
+    public void withdraw(BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) < 1) {
+            throw new IllegalArgumentException("cannot withdraw zero or negative amount");
+        }
+
+        synchronized (this) {
+            if (money.subtract(amount).compareTo(BigDecimal.ZERO) == -1) {
+                throw new IllegalStateException("not enough credit");
+            }
+
+            setMoney(money.subtract(amount));
+        }
+    }
+
+    public void deposit(BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) < 1) {
+            throw new IllegalArgumentException("cannot deposit zero or negative amount");
+        }
+
+        synchronized (this) {
+            setMoney(money.add(amount));
+        }
+    }
+
+    public BigDecimal getMoney() {
+        return money;
+    }
+
+    private void setMoney(BigDecimal money) {
+        this.money = money;
     }
 }

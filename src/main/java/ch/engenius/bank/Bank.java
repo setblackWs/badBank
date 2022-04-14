@@ -9,10 +9,12 @@ public class Bank {
     /*
      * Creates an account with specified account number and initial amount of credits.
      *
-     * @param  accountNumber         Number of the account
-     * @param  amount                Initial credit for the account
+     * @param accountNumber Number of the account
+     *
+     * @param amount Initial credit for the account
+     *
      * @thorws IllegalStateException If account with given number has already been registered
-     * */
+     */
     public Account registerAccount(int accountNumber, BigDecimal amount) {
         if (accounts.containsKey(accountNumber)) {
             throw new IllegalStateException("account already exists");
@@ -26,9 +28,10 @@ public class Bank {
     /*
      * Retrieve account by its number
      *
-     * @param  accountNumber             Number of the account to retrieve
-     * @throws IllegalStateException     If account with given number is not registered
-     * */
+     * @param accountNumber Number of the account to retrieve
+     *
+     * @throws IllegalStateException If account with given number is not registered
+     */
     public Account getAccount(int accountNumber) {
         if (!accounts.containsKey(accountNumber)) {
             throw new IllegalStateException("account does not exist");

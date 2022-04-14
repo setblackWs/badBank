@@ -37,7 +37,7 @@ public class AccountTest {
     @Test
     public void shouldFailToDepositNothing() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                                                          () -> account.deposit(BigDecimal.ZERO));
+                () -> account.deposit(BigDecimal.ZERO));
         assertEquals("cannot deposit zero or negative amount", exception.getMessage());
     }
 
@@ -58,14 +58,14 @@ public class AccountTest {
     @Test
     public void shouldFailToWithdrawNothing() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                                                          () -> account.withdraw(BigDecimal.ZERO));
+                () -> account.withdraw(BigDecimal.ZERO));
         assertEquals("cannot withdraw zero or negative amount", exception.getMessage());
     }
 
     @Test
     public void shouldFailToWithdrawNegativeAmount() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                                                          () -> account.withdraw(BigDecimal.valueOf(-100)));
+                () -> account.withdraw(BigDecimal.valueOf(-100)));
         assertEquals("cannot withdraw zero or negative amount", exception.getMessage());
     }
 
@@ -74,7 +74,7 @@ public class AccountTest {
         final BigDecimal withdrawalAmount = BigDecimal.valueOf(321);
 
         IllegalStateException exception = assertThrows(IllegalStateException.class,
-                                                       () -> account.withdraw(BigDecimal.valueOf(321)));
+                () -> account.withdraw(BigDecimal.valueOf(321)));
         assertEquals("not enough credit", exception.getMessage());
     }
 }

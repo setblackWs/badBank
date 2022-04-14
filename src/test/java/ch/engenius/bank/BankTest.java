@@ -29,7 +29,7 @@ public class BankTest {
     @Test
     public void shouldFailToRegisterAccountIfAlreadyExists() {
         IllegalStateException exception = assertThrows(IllegalStateException.class,
-                                                       () -> bank.registerAccount(accountNumber, BigDecimal.ZERO));
+                () -> bank.registerAccount(accountNumber, BigDecimal.ZERO));
         assertEquals("account already exists", exception.getMessage());
     }
 
@@ -42,8 +42,7 @@ public class BankTest {
 
     @Test
     public void shouldFailToGetNonExistingAccount() {
-        IllegalStateException exception = assertThrows(IllegalStateException.class,
-                                                       () -> bank.getAccount(550));
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> bank.getAccount(550));
         assertEquals("account does not exist", exception.getMessage());
     }
 }

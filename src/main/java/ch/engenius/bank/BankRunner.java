@@ -15,22 +15,20 @@ public class BankRunner {
     private final Random random = new Random(43);
     private final Bank bank = new Bank();
 
-
     public static void main(String[] args) {
         BankRunner runner = new BankRunner();
         int accounts = 100;
-        int defaultDeposit  = 1000;
-        int iterations  = 10000;
+        int defaultDeposit = 1000;
+        int iterations = 10000;
         runner.registerAccounts(accounts, defaultDeposit);
-        runner.sanityCheck(accounts, accounts*defaultDeposit);
+        runner.sanityCheck(accounts, accounts * defaultDeposit);
         runner.runBank(iterations, accounts);
-        runner.sanityCheck(accounts, accounts*defaultDeposit);
-
+        runner.sanityCheck(accounts, accounts * defaultDeposit);
     }
 
     private void runBank(int iterations, int maxAccount) {
-        for (int i =0; i< iterations; i++ ) {
-            executor.submit( ()-> runRandomOperation(maxAccount));
+        for (int i = 0; i < iterations; i++) {
+            executor.submit(() -> runRandomOperation(maxAccount));
         }
         try {
             executor.shutdown();
@@ -46,33 +44,28 @@ public class BankRunner {
     }
 
     private void runRandomOperation(int maxAccount) {
-        BigDecimal transfer = BigDecimal.valueOf(random.nextDouble())
-                                .multiply(BigDecimal.valueOf(100));
+        BigDecimal transfer = BigDecimal.valueOf(random.nextDouble()).multiply(BigDecimal.valueOf(100));
         int accountInNumber = random.nextInt(maxAccount);
         int accountOutNumber = random.nextInt(maxAccount);
-        Account accIn  =bank.getAccount(accountInNumber);
-        Account accOut  =bank.getAccount(accountOutNumber);
+        Account accIn = bank.getAccount(accountInNumber);
+        Account accOut = bank.getAccount(accountOutNumber);
         accOut.withdraw(transfer);
         accIn.deposit(transfer);
     }
 
-    private void  registerAccounts(int number, int defaultMoney) {
-        for ( int i = 0; i < number; i++) {
+    private void registerAccounts(int number, int defaultMoney) {
+        for (int i = 0; i < number; i++) {
             bank.registerAccount(i, BigDecimal.valueOf(defaultMoney));
         }
     }
 
-    private void sanityCheck( int accountMaxNumber, int totalExpectedMoney) {
-        BigDecimal sum = IntStream.range(0, accountMaxNumber)
-                .mapToObj( bank::getAccount)
-                .map ( Account::getMoney)
-                .reduce( BigDecimal.ZERO, BigDecimal::add);
+    private void sanityCheck(int accountMaxNumber, int totalExpectedMoney) {
+        BigDecimal sum = IntStream.range(0, accountMaxNumber).mapToObj(bank::getAccount).map(Account::getMoney)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        if ( sum.intValue() != totalExpectedMoney) {
-            throw new IllegalStateException("we got "+ sum + " != " + totalExpectedMoney +" (expected)");
+        if (sum.intValue() != totalExpectedMoney) {
+            throw new IllegalStateException("we got " + sum + " != " + totalExpectedMoney + " (expected)");
         }
         System.out.println("sanity check OK");
     }
-
-
 }

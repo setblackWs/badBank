@@ -1,0 +1,5 @@
+Another improvements that could be done is adding validation service layer, so for example we would have
+BankServiceImplementaion and BankServiceValidation. Main benefit of this would be that our implementaion
+service would we responsibility to only do business logic and not bothering with validation
+
+Another good improvement would be using one of the loggers(log4j probably) for logging certain events like creating accounts, transferring money etc.

@@ -10,7 +10,6 @@ public class Account {
             throw new IllegalStateException("not enough credits on account");
         }
         setMoney(money - amount);
-
     }
 
     public void deposit(double amount) {

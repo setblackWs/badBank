@@ -3,7 +3,7 @@ package ch.engenius.bank;
 import java.util.HashMap;
 
 public class Bank {
-    private HashMap<Integer, Account> accounts = new HashMap<>();
+    private final HashMap<Integer, Account> accounts = new HashMap<>();
 
     public Account registerAccount(int accountNumber, int amount) {
         Account account = new Account();
@@ -12,7 +12,7 @@ public class Bank {
         return account;
     }
 
-    public Account getAccount( int number) {
+    public Account getAccount(int number) {
         return accounts.get(number);
     }
 }

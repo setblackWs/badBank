@@ -14,34 +14,30 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class BankTest {
     private Bank bank;
-    private final BigDecimal initialAccountMoney = BigDecimal.valueOf(100);
+    private Money initialAccountMoney;
 
     @BeforeEach
     public void setUp() {
         bank = new Bank();
+        initialAccountMoney = new Money(BigDecimal.valueOf(100));
     }
 
     @Test
     void shouldRegisterAccount_whenAccountNumberAndMoneyProvided() {
-        Money money = new Money(initialAccountMoney);
         AccountNumber accountNumber = new AccountNumber(1);
 
-        bank.registerAccount(accountNumber, money);
-
-        Account account = bank.getAccount(accountNumber);
-        assertNotNull(account);
+        assertNotNull(bank.registerAccount(accountNumber, initialAccountMoney));
     }
 
     @Test
     void shouldTransferMoney_whenPayerAccountAndPayeeAccountAndMoneyProvided() {
-        Money initialMoney = new Money(initialAccountMoney);
         Money transferMoney = new Money(BigDecimal.valueOf(20));
 
         AccountNumber payerAccountNumber = new AccountNumber(1);
-        bank.registerAccount(payerAccountNumber, initialMoney);
+        bank.registerAccount(payerAccountNumber, initialAccountMoney);
 
         AccountNumber payeeAccountNumber = new AccountNumber(2);
-        bank.registerAccount(payeeAccountNumber, initialMoney);
+        bank.registerAccount(payeeAccountNumber, initialAccountMoney);
 
         bank.transferMoney(payerAccountNumber, payeeAccountNumber, transferMoney);
 
@@ -49,8 +45,18 @@ class BankTest {
         Account payee = bank.getAccount(payeeAccountNumber);
 
         assertEquals(payer.getMoney().getAmount(),
-                initialMoney.getAmount().subtract(transferMoney.getAmount()));
+                initialAccountMoney.getAmount().subtract(transferMoney.getAmount()));
         assertEquals(payee.getMoney().getAmount(),
-                initialMoney.getAmount().add(transferMoney.getAmount()));
+                initialAccountMoney.getAmount().add(transferMoney.getAmount()));
+    }
+
+    @Test
+    void shouldGetAccount_whenAccountNumberProvided() {
+        AccountNumber accountNumber = new AccountNumber(1);
+        bank.registerAccount(accountNumber, initialAccountMoney);
+
+        Account account = bank.getAccount(accountNumber);
+
+        assertNotNull(account);
     }
 }

@@ -1,7 +1,6 @@
 package ch.engenius.bank;
 
 import ch.engenius.bank.domain.Account;
-import ch.engenius.bank.exception.AccountException;
 import ch.engenius.bank.model.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

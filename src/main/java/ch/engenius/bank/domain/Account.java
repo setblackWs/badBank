@@ -21,7 +21,7 @@ public class Account {
     }
 
     @Synchronized
-    public void withdraw(Money amount) throws AccountException {
+    public void withdraw(Money amount) {
         if (money.getAmount().compareTo(amount.getAmount()) < 0) {
             throw new AccountException("Not enough credit on account");
         }
@@ -30,7 +30,7 @@ public class Account {
     }
 
     @Synchronized
-    public void deposit(Money amount) throws AccountException {
+    public void deposit(Money amount) {
         this.money = money.add(amount);
     }
 

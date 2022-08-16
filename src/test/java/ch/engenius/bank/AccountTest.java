@@ -1,6 +1,7 @@
 package ch.engenius.bank;
 
 import ch.engenius.bank.domain.Account;
+import ch.engenius.bank.model.AccountNumber;
 import ch.engenius.bank.model.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,10 +13,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class AccountTest {
     private Account account;
     private final Money initialAccountMoney = new Money(BigDecimal.valueOf(100));
+    private final AccountNumber defaultAccountNumber = new AccountNumber(1);
 
     @BeforeEach
     public void setUp() {
-        account = new Account(initialAccountMoney);
+        account = new Account(defaultAccountNumber, initialAccountMoney);
     }
 
     @Test

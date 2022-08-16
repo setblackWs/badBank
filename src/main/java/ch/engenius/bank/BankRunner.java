@@ -13,16 +13,15 @@ import java.util.stream.IntStream;
 
 @Slf4j
 public class BankRunner {
-
-    private static final ExecutorService executor = Executors.newFixedThreadPool(8);
-    private final Random random = new Random(43);
     private static final int DEFAULT_DEPOSIT = 1000;
     private static final int ITERATIONS = 10000;
     private static final int ACCOUNTS = 100;
+    private static final ExecutorService executor = Executors.newFixedThreadPool(8);
+    private final Random random = new Random(43);
     private final Bank bank;
 
     public BankRunner() {
-        ConcurrentMap<Integer, Account> accounts = new ConcurrentHashMap<>();
+        ConcurrentMap<AccountNumber, Account> accounts = new ConcurrentHashMap<>();
         this.bank = new Bank(accounts);
     }
 

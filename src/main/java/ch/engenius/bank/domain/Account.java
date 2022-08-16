@@ -1,22 +1,18 @@
 package ch.engenius.bank.domain;
 
 import ch.engenius.bank.exception.AccountException;
+import ch.engenius.bank.model.AccountNumber;
 import ch.engenius.bank.model.Money;
 import lombok.NonNull;
 import lombok.Synchronized;
 
-import java.math.BigDecimal;
-
 @NonNull
 public class Account {
-
     private Money money;
+    private final AccountNumber accountNumber;
 
-    public Account() {
-        this(new Money(BigDecimal.ZERO));
-    }
-
-    public Account(Money money) {
+    public Account(AccountNumber accountNumber, Money money) {
+        this.accountNumber = accountNumber;
         this.money = money;
     }
 
@@ -36,5 +32,9 @@ public class Account {
 
     public Money getMoney() {
         return money;
+    }
+
+    public AccountNumber getAccountNumber() {
+        return accountNumber;
     }
 }

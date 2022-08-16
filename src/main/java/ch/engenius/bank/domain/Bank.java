@@ -10,31 +10,29 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class Bank implements BankService {
-    private final ConcurrentMap<Integer, Account> accounts;
+    private final ConcurrentMap<AccountNumber, Account> accounts;
 
     public Bank() {
         this(new ConcurrentHashMap<>());
     }
 
-    public Bank(ConcurrentMap<Integer, Account> accounts) {
+    public Bank(ConcurrentMap<AccountNumber, Account> accounts) {
         this.accounts = accounts;
     }
 
     @Override
     public Account registerAccount(AccountNumber accountNumber, Money amount) {
-
-        if (accounts.containsKey(accountNumber.getNumber())) {
+        if (accounts.containsKey(accountNumber)) {
             throw new BankException("Account already exists");
         }
 
-        Account account = new Account(amount);
-        accounts.put(accountNumber.getNumber(), account);
+        Account account = new Account(accountNumber, amount);
+        accounts.put(accountNumber, account);
         return account;
     }
 
     @Synchronized
     public void transferMoney(AccountNumber accountOutNumber, AccountNumber accountInNumber, Money moneyAmount) {
-
         Account payerAccount = getAccount(accountOutNumber);
         Account payeeAccount = getAccount(accountInNumber);
 
@@ -44,6 +42,9 @@ public class Bank implements BankService {
 
     @Override
     public Account getAccount(AccountNumber accountNumber) {
-        return accounts.get(accountNumber.getNumber());
+        if (accounts.get(accountNumber) == null) {
+            throw new BankException("Account not found");
+        }
+        return accounts.get(accountNumber);
     }
 }

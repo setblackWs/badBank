@@ -1,7 +1,13 @@
 package ch.engenius.bank;
 
+
+import ch.engenius.bank.domain.Bank;
+import ch.engenius.bank.domain.BankAccount;
+import ch.engenius.bank.exceptions.BankMoneyAmountException;
+
 import java.math.BigDecimal;
-import java.util.Random;
+import java.util.HashMap;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -9,63 +15,68 @@ import java.util.stream.IntStream;
 
 public class BankRunner {
 
-    private static final ExecutorService executor = Executors.newFixedThreadPool(8);
+    private static final int NUMBER_OF_BANK_ACCOUNTS = 1000;
+    private static final int NUMBER_OF_ITERATIONS = 1000;
+    private static final BigDecimal DEFAULT_DEPOSIT = BigDecimal.valueOf(100);
+    public static final BigDecimal TOTAL_BANK_MONEY_AMOUNT = DEFAULT_DEPOSIT.multiply(BigDecimal.valueOf(NUMBER_OF_BANK_ACCOUNTS));
+    private static final ExecutorService executorService = Executors.newFixedThreadPool(8);
+    private final Bank bank;
 
-    private final Random random = new Random(43);
-    private final Bank bank = new Bank();
-
+    public BankRunner() {
+        HashMap<UUID, BankAccount> accounts = new HashMap<>();
+        this.bank = new Bank(accounts);
+    }
 
     public static void main(String[] args) {
         BankRunner runner = new BankRunner();
-        int accounts = 100;
-        int defaultDeposit  = 1000;
-        int iterations  = 10000;
-        runner.registerAccounts(accounts, defaultDeposit);
-        runner.sanityCheck(accounts, accounts*defaultDeposit);
-        runner.runBank(iterations, accounts);
-        runner.sanityCheck(accounts, accounts*defaultDeposit);
-
+        runner.registerAccounts();
+        runner.bankMoneyAmountCheck();
+        runner.runTransactions();
+        runner.bankMoneyAmountCheck();
     }
 
-    private void runBank(int iterations, int maxAccount) {
-        for (int i =0; i< iterations; i++ ) {
-            executor.submit( ()-> runRandomOperation(maxAccount));
+    private void registerAccounts() {
+        IntStream.range(0, NUMBER_OF_BANK_ACCOUNTS).forEach(k ->
+                bank.registerBankAccount(UUID.randomUUID(), BankRunner.DEFAULT_DEPOSIT)
+        );
+    }
+
+    private void bankMoneyAmountCheck() {
+        BigDecimal currentTotalAmount = bank.getAccounts().values()
+                .stream()
+                .map(BankAccount::getMoneyAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (TOTAL_BANK_MONEY_AMOUNT.compareTo(currentTotalAmount) != 0) {
+            throw new BankMoneyAmountException("Bank money amount check failed.");
         }
+        System.out.println("Bank money amount check successful.");
+    }
+
+    private void runTransactions() {
+        for (int i = 0; i < NUMBER_OF_ITERATIONS; i++) {
+            executorService.submit(this::transferMoneyFromAndToRandomBankAccount);
+        }
+        executorService.shutdown();
         try {
-            executor.shutdown();
-            executor.awaitTermination(100,TimeUnit.SECONDS);
+            if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            System.out.println("InterruptedException occurred: " + e);
+            executorService.shutdownNow();
         }
     }
 
-    private void runRandomOperation(int maxAccount) {
-        double transfer = random.nextDouble()*100.0;
-        int accountInNumber = random.nextInt(maxAccount);
-        int accountOutNumber = random.nextInt(maxAccount);
-        Account accIn  =bank.getAccount(accountInNumber);
-        Account accOut  =bank.getAccount(accountOutNumber);
-        accIn.deposit(transfer);
-        accOut.withdraw(transfer);
-    }
+    private void transferMoneyFromAndToRandomBankAccount() {
+        BigDecimal transferMoneyAmount = BigDecimal.valueOf(Math.random() * DEFAULT_DEPOSIT.doubleValue());
 
-    private void  registerAccounts(int number, int defaultMoney) {
-        for ( int i = 0; i < number; i++) {
-            bank.registerAccount(i, defaultMoney);
+        UUID accountInId = bank.getRandomBankAccountId();
+        UUID accountOutId = bank.getRandomBankAccountId();
+        while (accountInId.equals(accountOutId)) {
+            accountOutId = bank.getRandomBankAccountId();
         }
+
+        bank.transferMoney(accountOutId, accountInId, transferMoneyAmount);
     }
-
-    private void sanityCheck( int accountMaxNumber, int totalExpectedMoney) {
-        BigDecimal sum = IntStream.range(0, accountMaxNumber)
-                .mapToObj( bank::getAccount)
-                .map ( Account::getMoneyAsBigDecimal)
-                .reduce( BigDecimal.ZERO, BigDecimal::add);
-
-        if ( sum.intValue() != totalExpectedMoney) {
-            throw new IllegalStateException("we got "+ sum + " != " + totalExpectedMoney +" (expected)");
-        }
-        System.out.println("sanity check OK");
-    }
-
-
 }

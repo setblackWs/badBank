@@ -36,7 +36,7 @@ public class BankRunner {
     }
 
     private void registerAccounts() {
-        IntStream.range(0, BankRunner.NUMBER_OF_BANK_ACCOUNTS).forEach(k ->
+        IntStream.range(0, NUMBER_OF_BANK_ACCOUNTS).forEach(k ->
                 bank.registerBankAccount(UUID.randomUUID(), BankRunner.DEFAULT_DEPOSIT)
         );
     }
@@ -47,14 +47,14 @@ public class BankRunner {
                 .map(BankAccount::getMoneyAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        if (BankRunner.TOTAL_BANK_MONEY_AMOUNT.compareTo(currentTotalAmount) != 0) {
+        if (TOTAL_BANK_MONEY_AMOUNT.compareTo(currentTotalAmount) != 0) {
             throw new BankMoneyAmountException("Bank money amount check failed.");
         }
         System.out.println("Bank money amount check successful.");
     }
 
     private void runTransactions() {
-        for (int i = 0; i < BankRunner.NUMBER_OF_ITERATIONS; i++) {
+        for (int i = 0; i < NUMBER_OF_ITERATIONS; i++) {
             executorService.submit(this::transferMoneyFromAndToRandomBankAccount);
         }
         executorService.shutdown();

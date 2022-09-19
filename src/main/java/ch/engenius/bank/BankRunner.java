@@ -18,7 +18,7 @@ public class BankRunner {
     private static final int NUMBER_OF_BANK_ACCOUNTS = 1000;
     private static final int NUMBER_OF_ITERATIONS = 1000;
     private static final BigDecimal DEFAULT_DEPOSIT = BigDecimal.valueOf(100);
-    public static final BigDecimal TOTAL_BANK_DEPOSIT = DEFAULT_DEPOSIT.multiply(BigDecimal.valueOf(NUMBER_OF_BANK_ACCOUNTS));
+    public static final BigDecimal TOTAL_BANK_MONEY_AMOUNT = DEFAULT_DEPOSIT.multiply(BigDecimal.valueOf(NUMBER_OF_BANK_ACCOUNTS));
     private static final ExecutorService executorService = Executors.newFixedThreadPool(8);
     private final Bank bank;
 
@@ -47,7 +47,7 @@ public class BankRunner {
                 .map(BankAccount::getMoneyAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        if (BankRunner.TOTAL_BANK_DEPOSIT.compareTo(currentTotalAmount) != 0) {
+        if (BankRunner.TOTAL_BANK_MONEY_AMOUNT.compareTo(currentTotalAmount) != 0) {
             throw new BankMoneyAmountException("Bank money amount check failed.");
         }
         System.out.println("Bank money amount check successful.");

@@ -27,3 +27,22 @@ Your job is to find bugs and other problems in the implementation.
 3. Additionally try to fix or list other potential code quality issues that you see.
 4. You are free to create additional classes or files as needed. 
 
+
+## Solution
+
+Two main issues in the assignment are having non-thread-safe operations and the usage of `double` for currency calculations. 
+Deposit and withdraw methods now use `ReentrantLock` class and `tryLock()` to ensure that only one thread can change the account balance at 
+a time and prevent data corruption. Using `double` for currency calculations introduces precision issues, which are resolved 
+with the usage of `BigDecimal`.
+
+Some of the other improvements include:
+
+- Extracting constants into the configuration file.
+- Using a `logger` instead of `System.out.println()`. Trace logging has been added; to enable it, go to the resource/log4j2.xml 
+configuration file and set the level to trace.
+- To ensure the atomicity of the transfer method, both withdraw and deposit are set to return a `boolean`. Both operations,
+ must be successful in order to transfer money between accounts.
+- Removing the `setMoney` method and using deposit instead.
+- Amount validation for negative values.
+- Using `ThreadLocalRandom` which is generally recommended in a multithreaded environment.
+- `JUnit` tests added.

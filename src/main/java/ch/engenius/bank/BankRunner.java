@@ -5,6 +5,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
@@ -26,42 +29,48 @@ public class BankRunner {
     }
 
     private void runBank() {
+        List<Callable<Void>> randomOperationTasks = new ArrayList<>();
         for (int i = 0; i < BankRunnerConstants.ITERATIONS; i++) {
-            executor.submit(this::runRandomOperation);
+            randomOperationTasks.add(() -> {
+                runRandomOperation();
+                return null;
+            });
         }
         try {
+            executor.invokeAll(randomOperationTasks);
             executor.shutdown();
-            boolean terminationStatus = executor.awaitTermination(100, TimeUnit.SECONDS);
-
-            if (!terminationStatus) {
+            if (!executor.awaitTermination(100, TimeUnit.SECONDS)) {
                 logger.error("Executor did not terminate within the specified timeout.");
-                executor.shutdownNow();
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
-            logger.error("InterruptedException occurred: {}", e.getMessage());
+            Thread.currentThread().interrupt();
+            logger.error("Execution was interrupted", e);
+        } finally {
+            if (!executor.isShutdown()) {
+                executor.shutdownNow();
+            }
         }
     }
 
-    private void runRandomOperation()  {
+    private void runRandomOperation() {
         BigDecimal transferAmount = BigDecimal.valueOf(random.nextDouble() * 100.0);
         int toAccountNumber = random.nextInt(BankRunnerConstants.ACCOUNTS_NUMBER);
         int fromAccountNumber = random.nextInt(BankRunnerConstants.ACCOUNTS_NUMBER);
         Account toAccount = bank.getAccount(toAccountNumber);
         Account fromAccount = bank.getAccount(fromAccountNumber);
 
-        logger.trace("Before transaction - From Account {}: {}", fromAccountNumber, fromAccount.getMoney());
-        logger.trace("Before transaction - To Account {}: {}", toAccountNumber, toAccount.getMoney());
+        logger.trace("Before transaction - From Account {}: {}", fromAccountNumber, fromAccount.getBalance());
+        logger.trace("Before transaction - To Account {}: {}", toAccountNumber, toAccount.getBalance());
 
         try {
             bank.transfer(fromAccount, toAccount, transferAmount);
-        } catch  (InterruptedException e) {
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             logger.error("Thread interrupted while running random operation", e);
         }
 
-        logger.trace("After transaction - From Account {}: {}", fromAccountNumber, fromAccount.getMoney());
-        logger.trace("After transaction - To Account {}: {}", toAccountNumber, toAccount.getMoney());
+        logger.trace("After transaction - From Account {}: {}", fromAccountNumber, fromAccount.getBalance());
+        logger.trace("After transaction - To Account {}: {}", toAccountNumber, toAccount.getBalance());
     }
 
     private void registerAccounts() throws InterruptedException {
@@ -74,7 +83,7 @@ public class BankRunner {
     private void sanityCheck() {
         BigDecimal sum = IntStream.range(0, BankRunnerConstants.ACCOUNTS_NUMBER)
                 .mapToObj(bank::getAccount)
-                .map(Account::getMoney)
+                .map(Account::getBalance)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         if (sum.compareTo(BankRunnerConstants.TOTAL_EXPECTED_AMOUNT) != 0) {

@@ -7,6 +7,10 @@ public class Bank {
     private final ConcurrentHashMap<Integer, Account> accounts = new ConcurrentHashMap<>();
 
     public void registerAccount(int accountNumber, BigDecimal amount) throws InterruptedException {
+        if (accounts.containsKey(accountNumber)) {
+            throw new IllegalArgumentException("Account with number " + accountNumber + "  already exits.");
+        }
+
         Account account = new Account();
         account.deposit(amount);
         accounts.put(accountNumber, account);

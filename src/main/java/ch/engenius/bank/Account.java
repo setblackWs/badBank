@@ -7,21 +7,21 @@ import org.apache.logging.log4j.Logger;
 import java.math.BigDecimal;
 
 public class Account {
-    private BigDecimal money = new BigDecimal("0");
+    private BigDecimal balance = new BigDecimal("0");
     private static final Logger log = LogManager.getLogger(Account.class);
     private final ThreadContext threadContext = new ThreadContext();
 
     public boolean withdraw(BigDecimal amount) throws InterruptedException {
         return threadContext.withThreadLock(() -> {
-            if (money.compareTo(amount) < 0) {
-                log.error("There is not enough money on this account");
+            if (balance.compareTo(amount) < 0) {
+                log.info("There is not enough balance on this account");
                 return false;
             }
             if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-                log.error("Amount cannot be less than zero.");
+                log.info("Amount cannot be less than or equal to zero.");
                 return false;
             }
-            money = money.subtract(amount);
+            balance = balance.subtract(amount);
             return true;
         });
     }
@@ -29,7 +29,7 @@ public class Account {
     public boolean deposit(BigDecimal amount) throws InterruptedException {
         return threadContext.withThreadLock(() -> {
             try {
-                money = money.add(amount);
+                balance = balance.add(amount);
                 return true;
             } catch (Exception e) {
                 log.error("Exception occurred {}", e.getMessage());
@@ -38,7 +38,7 @@ public class Account {
         });
     }
 
-    public BigDecimal getMoney() {
-        return money;
+    public BigDecimal getBalance() {
+        return balance;
     }
 }

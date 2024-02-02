@@ -26,18 +26,18 @@ public class AccountTest {
         boolean result = account.withdraw(withdrawAmount);
 
         assertFalse(result, "Withdraw should return false when there is insufficient balance");
-        assertEquals(initialBalance, account.getMoney(), "Balance should remain unchanged after a failed withdraw");
+        assertEquals(initialBalance, account.getBalance(), "Balance should remain unchanged after a failed withdraw");
     }
 
     @Test
     public void whenDepositToAccount_withPositiveAmount_balanceIsIncreased() throws InterruptedException {
-        BigDecimal initialBalance = account.getMoney();
+        BigDecimal initialBalance = account.getBalance();
 
         BigDecimal depositAmount = new BigDecimal("100");
         account.deposit(depositAmount);
 
         BigDecimal expectedBalance = initialBalance.add(depositAmount);
-        assertEquals(expectedBalance, account.getMoney(), "Deposit should increase the balance");
+        assertEquals(expectedBalance, account.getBalance(), "Deposit should increase the balance");
     }
 
     @Test
@@ -49,7 +49,7 @@ public class AccountTest {
         account.withdraw(withdrawAmount);
 
         BigDecimal expectedBalance = initialBalance.subtract(withdrawAmount);
-        assertEquals(expectedBalance, account.getMoney(), "Withdraw should decrease the balance");
+        assertEquals(expectedBalance, account.getBalance(), "Withdraw should decrease the balance");
     }
 
     @Test
@@ -62,7 +62,7 @@ public class AccountTest {
         boolean result = account.withdraw(withdrawAmount);
 
         assertFalse(result, "Amount should be greater or equal to zero");
-        assertEquals(initialBalance, account.getMoney(), "Balance should remain unchanged after a failed withdraw");
+        assertEquals(initialBalance, account.getBalance(), "Balance should remain unchanged after a failed withdraw");
     }
 
     @Test
@@ -74,6 +74,6 @@ public class AccountTest {
         boolean result = account.withdraw(withdrawAmount);
 
         assertFalse(result, "Amount should be greater or equal to zero");
-        assertEquals(initialBalance, account.getMoney(), "Balance should remain unchanged after a failed withdraw");
+        assertEquals(initialBalance, account.getBalance(), "Balance should remain unchanged after a failed withdraw");
     }
 }

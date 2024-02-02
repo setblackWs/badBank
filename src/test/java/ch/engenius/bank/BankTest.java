@@ -1,13 +1,11 @@
 package ch.engenius.bank;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -27,7 +25,7 @@ public class BankTest {
         bank.registerAccount(accountNumber, initialDeposit);
 
         assertNotNull(bank.getAccount(accountNumber), "Registered account should not be null");
-        assertEquals(initialDeposit, bank.getAccount(accountNumber).getMoney(), "Initial deposit should match");
+        assertEquals(initialDeposit, bank.getAccount(accountNumber).getBalance(), "Initial deposit should match");
     }
 
     @Test
@@ -63,6 +61,6 @@ public class BankTest {
         thread1.join();
         thread2.join();
 
-        assertEquals(new BigDecimal("400"), account.getMoney());
+        assertEquals(new BigDecimal("400"), account.getBalance());
     }
 }
